@@ -1,7 +1,18 @@
-[
-    {
-        "name":"node-package-upgrader",
-        "url":"https://github.com/niyas-ali/node-package-upgrader.git",
-        "branch":""
-    }
-]
+{
+    "checkoutBranch":"features/package-upgrade",
+    "owner":"niyas-ali",
+    "prRequestTitle":"PR-config-pilot-job",
+    "prRequestMessage":"Creating PR for package migration",
+    "repository":[
+        {
+            "name":"node-package-upgrader",
+            "url":"https://github.com/niyas-ali/node-package-upgrader.git",
+            "branch":"master"
+        },
+        {
+            "name":"node-package-upgrader-1",
+            "url":"https://github.com/niyas-ali/node-package-upgrader-1.git",
+            "branch":"master"
+        }
+    ]
+}

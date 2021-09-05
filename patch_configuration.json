@@ -1,27 +1,23 @@
 [
     {
         "packageName":"babel-core",
-        "packageUrl":"babel-core",
         "minVersion":"^6.9.4",
         "forceUpgrade": true
     },
     
     {
         "packageName":"react-dom",
-        "packageUrl":"react-dom",
         "minVersion":"^15.1.1",
         "forceUpgrade": true
     },
     {
         "packageName":"axios",
-        "packageUrl":"axios",
-        "minVersion":"^0.21.1",
+        "minVersion":"^0.21.3",
         "forceUpgrade": true
     },
     {
         "packageName":"npm-check",
-        "packageUrl":"npm-check",
-        "minVersion":"^5.9.2",
+        "minVersion":"^5.9.4",
         "forceUpgrade": true
     }
 ]

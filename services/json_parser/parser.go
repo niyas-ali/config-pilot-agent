@@ -21,7 +21,7 @@ func JsonToModel(file string, model interface{}) error {
 	value, _ := ioutil.ReadAll(jsonFile)
 	if err := json.Unmarshal(value, &model); err != nil {
 		fmt.Println(err)
-		return errors.New((err.Error()))
+		return err
 	}
 	return nil
 }
@@ -37,7 +37,7 @@ func LoadFile(file string) (string, error) {
 	jsonFile, err := os.Open(fmt.Sprintf("%s\\%s", dir, file))
 	if err != nil {
 		fmt.Println(err)
-		return "", errors.New((err.Error()))
+		return "", err
 	}
 	defer jsonFile.Close()
 	value, _ := ioutil.ReadAll(jsonFile)

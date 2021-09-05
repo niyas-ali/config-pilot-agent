@@ -15,6 +15,7 @@ type NpmPatchManager struct {
 	packages      model.NpmPackage
 	Dependency    []*model.NpmDependencies
 	DevDependency []*model.NpmDependencies
+	RequireUpdate bool
 }
 
 func (patch *NpmPatchManager) LoadPatchData() {
@@ -49,6 +50,7 @@ func (patch *NpmPatchManager) VerifyAndUpgradePatches() {
 					if original.ForceUpgrade {
 						current.Value = original.MinVersion
 						log.Printf("force upgrading -> done")
+						patch.RequireUpdate = true
 					} else {
 						log.Println("force upgrade set to false for this package:", current.Name, "version:", current.Value)
 					}
