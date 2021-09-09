@@ -1,10 +1,9 @@
 package services
 
 import (
-	"bytes"
+	"config-pilot-job/controller"
+	"config-pilot-job/interfaces"
 	"config-pilot-job/model"
-	"config-pilot-job/utils"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -14,16 +13,16 @@ import (
 type GitProcess struct {
 	cmd             *exec.Cmd
 	repository      model.Repository
-	configuration   model.Configuration
 	npmPatchManager *NpmPatchManager
 	patchManager    *PatchManager
+	controllerApi   interfaces.ControllerApi
 }
 
-func NewGitProcess(config model.Configuration, repo model.Repository, patchManager *PatchManager) *GitProcess {
+func NewGitProcess(patchManager *PatchManager, repo model.Repository, controller interfaces.ControllerApi) *GitProcess {
 	git := new(GitProcess)
-	git.configuration = config
 	git.patchManager = patchManager
 	git.repository = repo
+	git.controllerApi = controller
 	git.npmPatchManager = &NpmPatchManager{Name: git.repository.Name, patchManager: git.patchManager}
 	return git
 }
@@ -62,13 +61,13 @@ func (git *GitProcess) SaveChanges() {
 }
 func (git *GitProcess) CheckoutBranch() error {
 	log.Println("checking out to new branch: ...")
-	git.cmd = exec.Command("git", "checkout", "-b", git.configuration.CheckoutBranch)
+	git.cmd = exec.Command("git", "checkout", "-b", getCheckBranch(git.controllerApi))
 	git.cmd.Dir = git.repository.Name
 	if out, err := git.cmd.Output(); err != nil {
 		log.Println("creating new branch failed with error:", err.Error(), string(out))
 		return err
 	} else {
-		log.Println(fmt.Sprintf("checked out to new branch: %s -> done", git.configuration.CheckoutBranch))
+		log.Println(fmt.Sprintf("checked out to new branch: %s -> done", getCheckBranch(git.controllerApi)))
 	}
 	log.Println("staging current changes to the branch...")
 	git.cmd = exec.Command("git", "add", ".")
@@ -93,7 +92,7 @@ func (git *GitProcess) CheckoutBranch() error {
 }
 func (git *GitProcess) PushingCodeChanges() error {
 	log.Println("pushing current branch...")
-	git.cmd = exec.Command("git", "push", "origin", git.configuration.CheckoutBranch)
+	git.cmd = exec.Command("git", "push", "origin", getCheckBranch(git.controllerApi))
 	git.cmd.Dir = git.repository.Name
 	if out, err := git.cmd.Output(); err != nil {
 		log.Println("pushing changes failed with error:", err.Error(), string(out))
@@ -106,7 +105,7 @@ func (git *GitProcess) PushingCodeChanges() error {
 func (git *GitProcess) cleanUpRemoteBranch() error {
 	// git.cmd = exec.Command("git", "pull", "origin", git.defaultBranch)
 	log.Println("cleaning up/syncing remote feature branch")
-	git.cmd = exec.Command("git", "push", "origin", "--delete", git.configuration.CheckoutBranch)
+	git.cmd = exec.Command("git", "push", "origin", "--delete", getCheckBranch(git.controllerApi))
 	git.cmd.Dir = git.repository.Name
 	if out, err := git.cmd.Output(); err != nil {
 		log.Println("cleaning up remote feature branch failed with error:", string(out))
@@ -123,20 +122,20 @@ func (git *GitProcess) Run() {
 	git.Scan()
 	git.SaveChanges()
 	git.Clean()
-
+}
+func getCheckBranch(t interfaces.ControllerApi) string {
+	switch c := t.(type) {
+	case controller.AzureDevopsApi:
+		return c.Request.SourceBranch
+	case controller.GithubApi:
+		return c.Request.SourceBranch
+	default:
+		return ""
+	}
 }
 func (git *GitProcess) CreatePr() {
-	log.Println(fmt.Sprintf("creating pull-request for %s branch to %s branch", git.configuration.CheckoutBranch, git.repository.Branch))
-	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/pulls", git.configuration.Owner, git.repository.Name)
-	head := fmt.Sprintf("%s:%s", git.configuration.Owner, git.configuration.CheckoutBranch)
-	postBody, _ := json.Marshal(map[string]string{
-		"head":  head,
-		"base":  git.repository.Branch,
-		"body":  git.configuration.PrRequestMessage,
-		"title": git.configuration.PrRequestTitle,
-	})
-	responseBody := *bytes.NewBuffer(postBody)
-	client := utils.NewClient()
-	client.SendRequest(url, responseBody)
+	log.Println(fmt.Sprintf("creating pull-request for %s branch to %s branch", getCheckBranch(git.controllerApi), git.repository.MergeBranch))
+	result := git.controllerApi.CreatePr()
+	log.Println(result)
 	log.Println("pull-request created -> done")
 }

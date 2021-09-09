@@ -7,7 +7,7 @@ import (
 )
 
 type PatchManager struct {
-	patches []model.Patch
+	patches []model.PatchConfiguration
 }
 
 func (p *PatchManager) LoadConfigurations() {
