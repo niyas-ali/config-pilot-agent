@@ -3,6 +3,7 @@ package services
 import (
 	"config-pilot-job/controller"
 	"config-pilot-job/model"
+	"os"
 )
 
 type ProcessManager struct {
@@ -18,7 +19,7 @@ func (p *ProcessManager) InitializeProcess() {
 	for _, repo := range repositoriesConfig.Config.AzureDevops.Repository {
 		azController := controller.AzureDevopsApi{
 			Organization: repositoriesConfig.Config.Organization,
-			Token:        "",
+			Token:        os.Getenv("TOKEN"),
 			Request: model.PullRequest{
 				RepositoryName: repo.Name,
 				ProjectName:    repositoriesConfig.Config.AzureDevops.ProjectName,
@@ -34,7 +35,7 @@ func (p *ProcessManager) InitializeProcess() {
 	for _, repo := range repositoriesConfig.Config.Github.Repository {
 		githubController := controller.GithubApi{
 			Organization: repositoriesConfig.Config.Organization,
-			Token:        "",
+			Token:        os.Getenv("TOKEN"),
 			Request: model.PullRequest{
 				RepositoryName: repo.Name,
 				SourceBranch:   repositoriesConfig.Config.CheckoutBranch,
