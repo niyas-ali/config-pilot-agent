@@ -1,8 +1,9 @@
 package services
 
 import (
-	"config-pilot-job/controller"
-	"config-pilot-job/model"
+	"config-pilot-agent/controller"
+	"config-pilot-agent/model"
+	"log"
 	"os"
 )
 
@@ -11,6 +12,10 @@ type ProcessManager struct {
 }
 
 func (p *ProcessManager) InitializeProcess() {
+	token := os.Getenv("TOKEN")
+	if token == "" {
+		log.Fatal("missing token, add 'TOKEN' in environment varialbe")
+	}
 	repositoriesConfig := NewRepositoryManager()
 	repositoriesConfig.LoadConfigurations()
 	patchManagerConfig := NewPatchManager()
@@ -19,7 +24,7 @@ func (p *ProcessManager) InitializeProcess() {
 	for _, repo := range repositoriesConfig.Config.AzureDevops.Repository {
 		azController := controller.AzureDevopsApi{
 			Organization: repositoriesConfig.Config.Organization,
-			Token:        os.Getenv("TOKEN"),
+			Token:        token,
 			Request: model.PullRequest{
 				RepositoryName: repo.Name,
 				ProjectName:    repositoriesConfig.Config.AzureDevops.ProjectName,
@@ -35,7 +40,7 @@ func (p *ProcessManager) InitializeProcess() {
 	for _, repo := range repositoriesConfig.Config.Github.Repository {
 		githubController := controller.GithubApi{
 			Organization: repositoriesConfig.Config.Organization,
-			Token:        os.Getenv("TOKEN"),
+			Token:        token,
 			Request: model.PullRequest{
 				RepositoryName: repo.Name,
 				SourceBranch:   repositoriesConfig.Config.CheckoutBranch,

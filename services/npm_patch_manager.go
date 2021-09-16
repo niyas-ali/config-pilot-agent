@@ -1,8 +1,8 @@
 package services
 
 import (
-	"config-pilot-job/model"
-	"config-pilot-job/services/json_parser"
+	"config-pilot-agent/model"
+	"config-pilot-agent/services/json_parser"
 	"fmt"
 	"log"
 

@@ -2,7 +2,7 @@ package controller
 
 import (
 	"bytes"
-	"config-pilot-job/model"
+	"config-pilot-agent/model"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -49,7 +49,7 @@ func sendRequest(token string, url string, body bytes.Buffer) string {
 		log.Println(err.Error())
 		return ""
 	}
-	req.Header.Set("User-Agent", "config-pilot-job")
+	req.Header.Set("User-Agent", "config-pilot-agent")
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {

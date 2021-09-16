@@ -1,9 +1,9 @@
 package services
 
 import (
-	"config-pilot-job/controller"
-	"config-pilot-job/interfaces"
-	"config-pilot-job/model"
+	"config-pilot-agent/controller"
+	"config-pilot-agent/interfaces"
+	"config-pilot-agent/model"
 	"fmt"
 	"log"
 	"os"
@@ -33,6 +33,8 @@ func (git *GitProcess) Clone() {
 		log.Println("cloning remote repository failed with error:", err.Error(), string(out))
 	} else {
 		log.Println("cloning remote repository: -> done")
+		git.Scan()
+		git.SaveChanges()
 	}
 }
 func (git *GitProcess) Clean() {
@@ -119,8 +121,7 @@ func (git *GitProcess) Run() {
 	log.Println("running git process job for ", git.repository.Name)
 	git.Clean()
 	git.Clone()
-	git.Scan()
-	git.SaveChanges()
+
 	git.Clean()
 }
 func getCheckBranch(t interfaces.ControllerApi) string {

@@ -1,43 +1,37 @@
-# Go
-# Build your Go project.
-# Add steps that test, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/go
-
-trigger:
-- main
+trigger: 
+ - master
 
 pool:
-  vmImage: ubuntu-latest
+   vmImage: 'ubuntu-latest'
 
 variables:
-  GOBIN:  '$(GOPATH)/bin' # Go binaries path
-  GOROOT: '/usr/local/go1.11' # Go installation path
-  GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
-  modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
-  
+   APP_NAME: 'config-pilot-job'
+steps: 
+- task: GoTool@0
+  inputs:
+    version: '1.13.5'
+- task: Go@0
+  displayName: 'Installing go dependencies'
+  inputs:
+    command: 'get'
+    arguments: '-d'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
+- task: Go@0
+  displayName: 'Building application' 
+  inputs:
+    command: 'build'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
 
-steps:
-- script: |
-    mkdir -p '$(GOBIN)'
-    mkdir -p '$(GOPATH)/pkg'
-    mkdir -p '$(modulePath)'
-    shopt -s extglob
-    shopt -s dotglob
-    mv !(gopath) '$(modulePath)'
-    echo '##vso[task.prependpath]$(GOBIN)'
-    echo '##vso[task.prependpath]$(GOROOT)/bin'
-  displayName: 'Set up the Go workspace'
+- task: InstallSSHKey@0
+  displayName: 'ssh key installation'
+  inputs:
+    hostName: 'vs-ssh.visualstudio.com'
+    sshPublicKey: '$(SSH_ID_PUBKEY)'
+    sshKeySecureFile: 'ssh_id_rsa'
 
 - script: |
-    go version
-    go get -v -t -d ./...
-    go build -v .
-  workingDirectory: '$(modulePath)'
-  displayName: 'Get dependencies, then build'
-
-- script: |
-    ./$(build.repository.name)
-  workingDirectory: '$(modulePath)'
+    ./$(APP_NAME)
+  workingDirectory: '$(System.DefaultWorkingDirectory)'
   displayName: 'Running application'
   env:
-    TOKEN: $(token)
+    TOKEN: $(AUTH_TOKEN)

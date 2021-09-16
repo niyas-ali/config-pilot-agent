@@ -12,7 +12,7 @@ import (
 func JsonToModel(file string, model interface{}) error {
 	dir, _ := os.Getwd()
 	log.Println("loading file:", dir, file)
-	jsonFile, err := os.Open(fmt.Sprintf("%s\\%s", dir, file))
+	jsonFile, err := os.Open(fmt.Sprintf("%s", file))
 	if err != nil {
 		fmt.Println(err)
 		return errors.New((err.Error()))

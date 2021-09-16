@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"config-pilot-job/model"
+	"config-pilot-agent/model"
 	"context"
 	"fmt"
 

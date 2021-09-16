@@ -1,4 +1,4 @@
-module config-pilot-job
+module config-pilot-agent
 
 go 1.15
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"config-pilot-job/services"
+	"config-pilot-agent/services"
 )
 
 func main() {

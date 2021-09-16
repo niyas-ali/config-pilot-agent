@@ -19,7 +19,7 @@ type NpmDependencies struct {
 }
 
 func GetPackagePath(root string) string {
-	return fmt.Sprintf("%s\\package.json", root)
+	return fmt.Sprintf("%s/package.json", root)
 }
 func cleanVersion(v string) string {
 	v = strings.ReplaceAll(v, "^", "")

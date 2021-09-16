@@ -1,20 +1,21 @@
 {
     "checkout_branch":"features/package-upgrade",
-    "organization":"https://dev.azure.com/niyasali",
-    "pr_title":"PR-config-pilot-job",
+    "organization":"niyas-ali",
+    "pr_title":"PR-config-pilot-agent",
     "pr_message":"Creating PR for package migration",
     "azure_devops":{
-        "project_name":"MVC Test -Demo",
+        "project_name":"",
         "repository":[
-            {
-                "name":"node-package-upgrader",
-                "url":"https://niyasali.visualstudio.com/MVC%20Test%20-Demo/_git/node-package-upgrader",
-                "merge_branch":"main"
-            }
+            
         ]
     },
     "github":{
         "repository":[
+            {
+                "name":"node-package-upgrader",
+                "url":"https://github.com/niyas-ali/node-package-upgrader.git",
+                "merge_branch":"master"
+            }
         ]
     }
 }
