@@ -3,7 +3,7 @@ package services
 import (
 	"config-pilot-agent/model"
 	"config-pilot-agent/services/json_parser"
-	"log"
+	"config-pilot-agent/utils/logger"
 )
 
 type RepositoryManager struct {
@@ -12,7 +12,7 @@ type RepositoryManager struct {
 
 func (r *RepositoryManager) LoadConfigurations() {
 	if err := json_parser.JsonToModel("repository.json", &r.Config); err != nil {
-		log.Fatalln("loading repository configuration failed")
+		logger.Fatalln("loading repository configuration failed")
 		panic(err)
 	}
 }

@@ -5,9 +5,9 @@ import (
 	"config-pilot-agent/model"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	"golang.org/x/oauth2"
@@ -22,7 +22,7 @@ type GithubApi struct {
 	Request model.PullRequest
 }
 
-func (g GithubApi) CreatePr() string {
+func (g GithubApi) CreatePr() (string, error) {
 	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/pulls", g.Organization, g.Request.RepositoryName)
 	head := fmt.Sprintf("%s:%s", g.Organization, g.Request.SourceBranch)
 	postBody, _ := json.Marshal(map[string]string{
@@ -32,11 +32,10 @@ func (g GithubApi) CreatePr() string {
 		"title": g.Request.Title,
 	})
 	responseBody := *bytes.NewBuffer(postBody)
-	//sendRequest("6tm32sbwmdqfcj6523qyyihjwebkwhdkimrbtdg6xt2dagaor3pa", url, responseBody)
 	return sendRequest(g.Token, url, responseBody)
 }
 
-func sendRequest(token string, url string, body bytes.Buffer) string {
+func sendRequest(token string, url string, body bytes.Buffer) (string, error) {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{
@@ -46,16 +45,18 @@ func sendRequest(token string, url string, body bytes.Buffer) string {
 	client := oauth2.NewClient(ctx, ts)
 	req, err := http.NewRequest("POST", url, &body)
 	if err != nil {
-		log.Println(err.Error())
-		return ""
+		return "", err
 	}
 	req.Header.Set("User-Agent", "config-pilot-agent")
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println(err.Error())
+		return "", err
 	}
 	defer resp.Body.Close()
 	response, _ := ioutil.ReadAll(resp.Body)
-	return string(response)
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		return "", nil
+	}
+	return "", errors.New(string(response))
 }

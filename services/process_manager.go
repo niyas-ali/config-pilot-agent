@@ -3,7 +3,7 @@ package services
 import (
 	"config-pilot-agent/controller"
 	"config-pilot-agent/model"
-	"log"
+	"config-pilot-agent/utils/logger"
 	"os"
 )
 
@@ -12,18 +12,24 @@ type ProcessManager struct {
 }
 
 func (p *ProcessManager) InitializeProcess() {
-	token := os.Getenv("TOKEN")
-	if token == "" {
-		log.Fatal("missing token, add 'TOKEN' in environment varialbe")
-	}
+
 	repositoriesConfig := NewRepositoryManager()
 	repositoriesConfig.LoadConfigurations()
 	patchManagerConfig := NewPatchManager()
 	patchManagerConfig.LoadConfigurations()
-
+	if err := repositoriesConfig.Config.Validate(); err != nil {
+		logger.Fatalf("validation -> %s", err.Error())
+	}
+	if err := patchManagerConfig.Validate(); err != nil {
+		logger.Fatalf("validation -> %s", err.Error())
+	}
 	for _, repo := range repositoriesConfig.Config.AzureDevops.Repository {
+		token := os.Getenv("AZ_TOKEN")
+		if token == "" {
+			logger.Fatalln("missing token, add 'AZ_TOKEN' in environment varialbe")
+		}
 		azController := controller.AzureDevopsApi{
-			Organization: repositoriesConfig.Config.Organization,
+			Organization: repositoriesConfig.Config.AzureDevops.Organization,
 			Token:        token,
 			Request: model.PullRequest{
 				RepositoryName: repo.Name,
@@ -32,14 +38,19 @@ func (p *ProcessManager) InitializeProcess() {
 				TargetBranch:   repo.MergeBranch,
 				Description:    repositoriesConfig.Config.PrMessage,
 				Title:          repositoriesConfig.Config.PrTitle,
+				Reviewer:       repo.Reviewer,
 			},
 		}
 		gitProcess := NewGitProcess(patchManagerConfig, repo, azController)
 		p.AddProcess(*gitProcess)
 	}
 	for _, repo := range repositoriesConfig.Config.Github.Repository {
+		token := os.Getenv("GITHUB_TOKEN")
+		if token == "" {
+			logger.Fatalln("missing token, add 'GITHUB_TOKEN' in environment varialbe")
+		}
 		githubController := controller.GithubApi{
-			Organization: repositoriesConfig.Config.Organization,
+			Organization: repositoriesConfig.Config.Github.Organization,
 			Token:        token,
 			Request: model.PullRequest{
 				RepositoryName: repo.Name,

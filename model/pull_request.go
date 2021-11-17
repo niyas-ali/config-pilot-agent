@@ -7,4 +7,5 @@ type PullRequest struct {
 	TargetBranch   string
 	Description    string
 	Title          string
+	Reviewer       string
 }

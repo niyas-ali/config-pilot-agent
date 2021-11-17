@@ -1,0 +1,26 @@
+{
+    "checkout_branch":"features/__package-upgrade",
+    "pr_title":"Automation - Package dependency upgrade",
+    "pr_message":"",
+    "azure_devops":{
+        "organization":"",
+        "project_name":"",
+        "repository":[
+            {
+                "name":"",
+                "url":"",
+                "merge_branch":""
+            }
+        ]
+    },
+    "github":{
+        "organization":"",
+        "repository":[
+            {
+                "name":"",
+                "url":"",
+                "merge_branch":""
+            }
+        ]
+    }
+}

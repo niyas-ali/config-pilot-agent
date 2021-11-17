@@ -1,5 +1,5 @@
 package interfaces
 
 type ControllerApi interface {
-	CreatePr() string
+	CreatePr() (string, error)
 }

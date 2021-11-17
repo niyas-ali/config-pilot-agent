@@ -1,4 +1,4 @@
-# config-pilot-agent
+# config-pilot-job
 
 to run the code
 

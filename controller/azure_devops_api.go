@@ -18,11 +18,13 @@ type AzureDevopsApi struct {
 	Request model.PullRequest
 }
 
-func (az AzureDevopsApi) CreatePr() string {
-	//connection := azuredevops.NewPatConnection("https://dev.azure.com/niyasali", "h6b5oytxz2ecii2brgdwazcaa5peum7dsheoxgshq2scmet3vsfq")
-	connection := azuredevops.NewPatConnection(az.Organization, az.Token)
+func (az AzureDevopsApi) CreatePr() (string, error) {
+	connection := azuredevops.NewPatConnection(fmt.Sprintf("https://dev.azure.com/%s", az.Organization), az.Token)
 	ctx := context.Background()
-	client, _ := azuregit.NewClient(ctx, connection)
+	client, err := azuregit.NewClient(ctx, connection)
+	if err != nil {
+		return "", err
+	}
 	pr := azuregit.CreatePullRequestArgs{}
 	repoId := az.Request.RepositoryName
 	sourceBranch := fmt.Sprintf("refs/heads/%s", az.Request.SourceBranch)
@@ -37,7 +39,7 @@ func (az AzureDevopsApi) CreatePr() string {
 	}
 	result, err := client.CreatePullRequest(ctx, pr)
 	if err != nil {
-		return err.Error()
+		return "", err
 	}
-	return fmt.Sprintf("pull-request id:%d", *result.PullRequestId)
+	return fmt.Sprintf("pull-request id:%d", *result.PullRequestId), nil
 }
