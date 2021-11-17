@@ -25,7 +25,7 @@ Clone the repo and then run `run.sh` file
 
 ### repository configuration - *repository.json*
 
-```json
+```JSON
 {
     "checkout_branch":"features/__package-upgrade",
     "pr_title":"Automation - Package dependency upgrade",
@@ -57,7 +57,7 @@ Clone the repo and then run `run.sh` file
 ```
 ### patch configuration - *patch_configuration.json*
 
-```json
+```JSON
 [
     {
         "packageName":"",
@@ -67,3 +67,12 @@ Clone the repo and then run `run.sh` file
     ...
 ]
 ```
+### Configure tokens
+
+In order to clone/raise pr for private repositories, token needs to be configured in the system environment variable for azure DevOps and Github
+For Azure
+
+| key | value |
+|--|--|
+| AZ_TOKEN | secret |
+| GITHUB_TOKEN| secret |
